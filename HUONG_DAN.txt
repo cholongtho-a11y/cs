@@ -1,0 +1,12 @@
+CÀI GOOGLE SHEET NHẬN CHỈ SỐ (làm 1 lần, đăng nhập tài khoản cholongtho@gmail.com)
+
+1. Vào sheets.new, đặt tên file: "ChiSo_DienNuoc_ChoLongTho".
+2. Menu Tiện ích mở rộng (Extensions) > Apps Script.
+3. Xoá hết mã có sẵn, dán toàn bộ nội dung file Code.gs, bấm biểu tượng Lưu.
+4. Chọn hàm "caiDat" ở thanh trên, bấm Chạy (Run). Lần đầu Google hỏi quyền: chọn tài khoản > Nâng cao > Đi tới (không an toàn) > Cho phép.
+5. Bấm Triển khai (Deploy) > Tùy chọn triển khai mới > biểu tượng bánh răng chọn "Ứng dụng web":
+   - Thực thi bằng: Tôi
+   - Người có quyền truy cập: Bất kỳ ai
+   Bấm Triển khai, sao chép "URL ứng dụng web" (dạng https://script.google.com/macros/s/.../exec) rồi gửi lại cho Claude.
+6. Đầu mỗi kỳ: vào tab CauHinh, đổi ô B1 sang kỳ mới (ví dụ 12/2026).
+7. Cuối đợt ghi: tab ChiSo > Tệp > Tải xuống > Giá trị phân tách bằng dấu phẩy (.csv), rồi nạp vào Excel bằng nút "Nạp file".

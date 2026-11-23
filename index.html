@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ghi chỉ số">
+<meta name="robots" content="noindex,nofollow">
+<title>Ghi chỉ số điện nước</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:18px -apple-system,Helvetica,Arial,sans-serif;background:#f2f4f7;color:#111}
+.w{max-width:480px;margin:0 auto;padding:14px}
+.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+h1{font-size:15px;margin:0 0 4px;color:#666;font-weight:600}
+.sap{font-size:44px;font-weight:800;line-height:1.1}
+.loai{display:inline-block;padding:4px 12px;border-radius:20px;color:#fff;font-weight:700;font-size:20px;vertical-align:middle;margin-left:8px}
+.D{background:#e8a200}.N{background:#1c7ed6}
+input{width:100%;font-size:34px;padding:12px;border:2px solid #bbb;border-radius:12px;margin-top:8px}
+input:focus{outline:none;border-color:#2b6cb0}
+.big{font-size:40px;font-weight:700;letter-spacing:1px;min-height:50px;color:#2b6cb0;word-break:break-all}
+button{width:100%;font-size:24px;font-weight:700;padding:16px;border:0;border-radius:12px;background:#2f9e44;color:#fff;margin-top:10px}
+button.p{background:#868e96;font-size:17px;padding:10px}
+button:disabled{background:#bbb}
+.ok{background:#d3f9d8;color:#1b6b2a}.er{background:#ffe3e3;color:#a61e1e}.wa{background:#fff3bf;color:#7a5b00}
+.msg{padding:12px;border-radius:10px;margin-top:10px;font-size:17px}
+.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:16px}
+.s{font-size:14px;color:#666}
+</style></head><body><div class="w">
+<div id="cho" class="card" style="display:none">
+ <h1>GHI CHỈ SỐ ĐIỆN NƯỚC</h1>
+ <p>Mở <b>Camera</b> của iPhone, hướng vào tem QR trên đồng hồ rồi chạm vào dòng hiện lên.</p>
+</div>
+<div id="nhap" style="display:none">
+ <div class="card"><h1>KỲ <span id="ky">…</span></h1>
+  <span class="sap" id="sap"></span><span class="loai" id="loai"></span></div>
+ <div class="card"><h1>CHỈ SỐ MỚI TRÊN ĐỒNG HỒ</h1>
+  <div class="big" id="to"></div>
+  <input id="so" type="text" inputmode="decimal" autocomplete="off" placeholder="Gõ số">
+  <input id="gc" type="text" style="font-size:18px;padding:10px" placeholder="Ghi chú (nếu có: hỏng, mờ, không đọc được…)">
+  <button id="luu">LƯU</button>
+  <div id="kq"></div></div>
+</div>
+<div class="card" id="nguoiBox" style="display:none"><h1>TÊN NGƯỜI GHI (nhập một lần)</h1>
+ <input id="nguoi" type="text" style="font-size:22px" placeholder="Ví dụ: Tuấn"></div>
+<div class="card"><h1>ĐÃ GHI TRÊN MÁY NÀY (kỳ <span id="ky2">…</span>)</h1>
+ <div id="ds" class="s">Chưa có.</div>
+ <button class="p" id="gui">Gửi lại các số chưa gửi được</button></div>
+</div>
+<script>
+var API = "https://script.google.com/macros/s/AKfycbygXm3ylvmNOsu5Zjv3ZBbz66bi830MF4TjR1LjLbSvFOacxAhlNpOEIpv4HXnjvgM6/exec";
+var KEY = "cs_ds", KN = "cs_nguoi", KK = "cs_ky";
+function $(i){return document.getElementById(i)}
+function doc(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+function ghi(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+var ky = doc(KK,""), ds = doc(KEY,[]), sap="", loai="";
+function tham(){
+  var q = decodeURIComponent((location.search||"").replace(/^\?/,"")).trim().toUpperCase();
+  var m = q.match(/^([A-Z0-9]+)[\-|_.]?([DN])$/);
+  if(!m) return false; sap=m[1]; loai=m[2]; return true;
+}
+function ve(){
+  $("ky").textContent=$("ky2").textContent=ky||"…";
+  var h=""; var dem=0;
+  ds.slice().reverse().forEach(function(x){
+    if(x.ky!==ky) return;
+    h+='<div class="row"><span><b>'+x.sap+'</b> '+(x.loai==="D"?"Điện":"Nước")+': <b>'+x.moi+'</b></span><span>'+(x.ok?"✓":"⏳ chưa gửi")+'</span></div>';
+    if(!x.ok) dem++;
+  });
+  $("ds").innerHTML=h||"Chưa có."; $("gui").style.display=dem?"block":"none";
+}
+function gui(x){
+  return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(x)})
+   .then(function(r){return r.json()}).then(function(j){
+     if(j.ok){x.ok=true; if(j.ky){x.ky=j.ky;} return {ok:true}}
+     return {ok:false,loi:j.loi||"Lỗi máy chủ"}
+   }).catch(function(){return {ok:false,loi:"Không có mạng hoặc máy chủ chưa phản hồi"}});
+}
+function guiTat(){
+  var chua=ds.filter(function(x){return !x.ok});
+  var p=Promise.resolve();
+  chua.forEach(function(x){p=p.then(function(){return gui(x)})});
+  return p.then(function(){ghi(KEY,ds);ve()});
+}
+function khoiDong(){
+  if(!API||API.indexOf("__")===0){$("cho").style.display="block";$("cho").innerHTML="<p>Trang chưa được cấu hình địa chỉ nhận dữ liệu.</p>";return}
+  fetch(API).then(function(r){return r.json()}).then(function(j){if(j&&j.ky){ky=j.ky;ghi(KK,ky)}ve()}).catch(function(){ve()});
+  var ng=doc(KN,""); $("nguoi").value=ng;
+  if(tham()){
+    $("nhap").style.display="block"; $("sap").textContent=sap;
+    $("loai").textContent=loai==="D"?"ĐIỆN":"NƯỚC"; $("loai").className="loai "+loai;
+    if(!ng) $("nguoiBox").style.display="block";
+    $("so").addEventListener("input",function(){
+      this.value=this.value.replace(/[^0-9.,]/g,""); $("to").textContent=this.value;});
+    $("luu").onclick=luu;
+    setTimeout(function(){$("so").focus()},300);
+  } else { $("cho").style.display="block"; }
+  ve();
+  if(ds.some(function(x){return !x.ok})) guiTat();
+}
+function luu(){
+  var v=$("so").value.trim().replace(",","."); var kq=$("kq");
+  var ng=$("nguoi").value.trim();
+  if(!ng){kq.className="msg er";kq.textContent="Hãy nhập tên người ghi ở ô bên dưới.";$("nguoiBox").style.display="block";return}
+  if(!/^\d{1,9}(\.\d{1,3})?$/.test(v)){kq.className="msg er";kq.textContent="Chỉ số chưa đúng. Chỉ gõ số.";return}
+  ghi(KN,ng);
+  var trungCu=ds.filter(function(x){return x.ky===ky&&x.sap===sap&&x.loai===loai});
+  if(trungCu.length && !$("luu").dataset.xn){
+    kq.className="msg wa";kq.textContent="Đồng hồ này đã ghi: "+trungCu[trungCu.length-1].moi+". Bấm LƯU lần nữa để ghi đè.";
+    $("luu").dataset.xn="1";return}
+  $("luu").disabled=true;
+  var x={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),sap:sap,loai:loai,moi:v,ghichu:$("gc").value,nguoi:ng,ky:ky,ok:false};
+  ds.push(x); ghi(KEY,ds);
+  kq.className="msg";kq.textContent="Đang gửi…";
+  gui(x).then(function(r){
+    ghi(KEY,ds);ve();$("luu").disabled=false;delete $("luu").dataset.xn;
+    if(r.ok){kq.className="msg ok";kq.innerHTML="✓ Đã lưu "+sap+" "+(loai==="D"?"điện":"nước")+": <b>"+v+"</b><br>Quét tem tiếp theo bằng Camera.";$("so").value="";$("to").textContent="";$("so").blur()}
+    else{kq.className="msg wa";kq.textContent="Đã nhớ trên máy nhưng chưa gửi được ("+r.loi+"). Có mạng sẽ tự gửi lại khi mở trang.";}
+  });
+}
+$("gui").onclick=guiTat;
+khoiDong();
+</script></body></html>
