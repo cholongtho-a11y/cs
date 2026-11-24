@@ -1,12 +1,13 @@
-CÀI GOOGLE SHEET NHẬN CHỈ SỐ (làm 1 lần, đăng nhập tài khoản cholongtho@gmail.com)
+GHI CHI SO DIEN NUOC - BAN 2 (cho Long Tho)
+Trang ghi: https://cholongtho-a11y.github.io/cs/
+May chu: Google Apps Script (Code.gs) gan vao Google Sheet.
+Ban cu luu trong thu muc cu/.
 
-1. Vào sheets.new, đặt tên file: "ChiSo_DienNuoc_ChoLongTho".
-2. Menu Tiện ích mở rộng (Extensions) > Apps Script.
-3. Xoá hết mã có sẵn, dán toàn bộ nội dung file Code.gs, bấm biểu tượng Lưu.
-4. Chọn hàm "caiDat" ở thanh trên, bấm Chạy (Run). Lần đầu Google hỏi quyền: chọn tài khoản > Nâng cao > Đi tới (không an toàn) > Cho phép.
-5. Bấm Triển khai (Deploy) > Tùy chọn triển khai mới > biểu tượng bánh răng chọn "Ứng dụng web":
-   - Thực thi bằng: Tôi
-   - Người có quyền truy cập: Bất kỳ ai
-   Bấm Triển khai, sao chép "URL ứng dụng web" (dạng https://script.google.com/macros/s/.../exec) rồi gửi lại cho Claude.
-6. Đầu mỗi kỳ: vào tab CauHinh, đổi ô B1 sang kỳ mới (ví dụ 12/2026).
-7. Cuối đợt ghi: tab ChiSo > Tệp > Tải xuống > Giá trị phân tách bằng dấu phẩy (.csv), rồi nạp vào Excel bằng nút "Nạp file".
+TRIEN KHAI (lam 1 lan)
+1. Mo Google Sheet > Tien ich mo rong > Apps Script > dan toan bo Code.gs moi > Luu.
+2. Chay ham caiDat (cho phep quyen) de tao cac tab ChiSo, DauKy, NhanVien, CauHinh.
+3. Tab NhanVien: nhap ten nhan vien cot TEN; menu "Chi so dien nuoc" > "Tao PIN" cap ma PIN.
+4. Tab CauHinh: B1 = thang tieu thu (vi du 11/2026); B2 = MO hoac DONG; B3 = khoa cho Excel tu tai (chep vao CAI_DAT, khoa GC_AUTO_KHOA).
+5. Trien khai > Quan ly trien khai > Sua > Phien ban moi > Trien khai (giu nguyen URL).
+6. Excel: GHI_CS > "1b. Gui DS dau ky" (hoac dan file CSV vao tab DauKy), roi nhan vien quet tem, nhap PIN mot lan.
+7. Sau khi ghi: GHI_CS > "3. Nap tu dong tu Google Sheet" > xu ly sheet KIEM_TRA_CS > Luu chi so.

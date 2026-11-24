@@ -7,114 +7,301 @@
 <title>Ghi chỉ số điện nước</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font:18px -apple-system,Helvetica,Arial,sans-serif;background:#f2f4f7;color:#111}
-.w{max-width:480px;margin:0 auto;padding:14px}
-.card{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
-h1{font-size:15px;margin:0 0 4px;color:#666;font-weight:600}
-.sap{font-size:44px;font-weight:800;line-height:1.1}
-.loai{display:inline-block;padding:4px 12px;border-radius:20px;color:#fff;font-weight:700;font-size:20px;vertical-align:middle;margin-left:8px}
+.w{max-width:520px;margin:0 auto;padding:12px}
+.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+h1{font-size:14px;margin:0 0 6px;color:#666;font-weight:700;letter-spacing:.3px}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:#444}
+.sap{font-size:42px;font-weight:800;line-height:1.1}
+.loai{display:inline-block;padding:3px 12px;border-radius:20px;color:#fff;font-weight:700;font-size:20px;vertical-align:middle;margin-left:8px}
 .D{background:#e8a200}.N{background:#1c7ed6}
-input{width:100%;font-size:34px;padding:12px;border:2px solid #bbb;border-radius:12px;margin-top:8px}
-input:focus{outline:none;border-color:#2b6cb0}
-.big{font-size:40px;font-weight:700;letter-spacing:1px;min-height:50px;color:#2b6cb0;word-break:break-all}
-button{width:100%;font-size:24px;font-weight:700;padding:16px;border:0;border-radius:12px;background:#2f9e44;color:#fff;margin-top:10px}
-button.p{background:#868e96;font-size:17px;padding:10px}
+.ten{font-size:20px;font-weight:700;margin-top:6px}.kv{color:#555;font-size:16px}
+.cu{display:flex;gap:10px;margin-top:10px}.cu div{flex:1;background:#f1f3f5;border-radius:10px;padding:8px;text-align:center}
+.cu b{display:block;font-size:24px}.cu span{font-size:13px;color:#666}
+input[type=text],input[type=password],input[type=tel],select{width:100%;font-size:30px;padding:12px;border:2px solid #bbb;border-radius:12px;margin-top:8px;background:#fff}
+input.nho{font-size:18px;padding:10px}
+input:focus,select:focus{outline:none;border-color:#2b6cb0}
+.big{font-size:34px;font-weight:700;min-height:44px;color:#2b6cb0;word-break:break-all}
+button{width:100%;font-size:22px;font-weight:700;padding:15px;border:0;border-radius:12px;background:#2f9e44;color:#fff;margin-top:10px}
+button.p{background:#868e96;font-size:16px;padding:10px}
 button:disabled{background:#bbb}
+.msg{padding:10px;border-radius:10px;margin-top:10px;font-size:17px}
 .ok{background:#d3f9d8;color:#1b6b2a}.er{background:#ffe3e3;color:#a61e1e}.wa{background:#fff3bf;color:#7a5b00}
-.msg{padding:12px;border-radius:10px;margin-top:10px;font-size:17px}
-.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:16px}
+.chip{display:block;width:100%;text-align:left;background:#fff;border:2px solid #dee2e6;border-radius:12px;padding:10px;margin-top:8px;font-size:18px;color:#111;font-weight:600}
+.chip small{display:block;font-weight:400;color:#555;font-size:14px}
+.chip.da{border-color:#9bd3a4;background:#f1fbf3}
+.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee;font-size:15px}
 .s{font-size:14px;color:#666}
+label.k{display:flex;gap:10px;align-items:center;font-size:17px;margin-top:10px}label.k input{width:24px;height:24px}
+.tabs{display:flex;gap:8px;margin-top:8px}.tabs button{margin:0;padding:10px;font-size:16px;background:#dee2e6;color:#333}.tabs button.on{background:#2b6cb0;color:#fff}
+.hide{display:none}
 </style></head><body><div class="w">
-<div id="cho" class="card" style="display:none">
- <h1>GHI CHỈ SỐ ĐIỆN NƯỚC</h1>
- <p>Mở <b>Camera</b> của iPhone, hướng vào tem QR trên đồng hồ rồi chạm vào dòng hiện lên.</p>
+
+<div id="vDN" class="card hide">
+ <h1>ĐĂNG NHẬP GHI CHỈ SỐ</h1>
+ <form id="fDN" autocomplete="on" onsubmit="return false">
+  <input id="dnTen" name="username" type="text" class="nho" autocomplete="username" placeholder="Tên của bạn" autocapitalize="words">
+  <input id="dnPin" name="password" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Mã PIN (do quản lý cấp)">
+  <button id="bDN" type="submit">ĐĂNG NHẬP</button>
+ </form>
+ <div id="kqDN"></div>
+ <p class="s">Nhập một lần, máy sẽ nhớ. Khi iPhone hỏi lưu mật khẩu, chọn "Lưu" để lần sau tự điền.</p>
 </div>
-<div id="nhap" style="display:none">
- <div class="card"><h1>KỲ <span id="ky">…</span></h1>
-  <span class="sap" id="sap"></span><span class="loai" id="loai"></span></div>
- <div class="card"><h1>CHỈ SỐ MỚI TRÊN ĐỒNG HỒ</h1>
-  <div class="big" id="to"></div>
-  <input id="so" type="text" inputmode="decimal" autocomplete="off" placeholder="Gõ số">
-  <input id="gc" type="text" style="font-size:18px;padding:10px" placeholder="Ghi chú (nếu có: hỏng, mờ, không đọc được…)">
-  <button id="luu">LƯU</button>
-  <div id="kq"></div></div>
+
+<div id="vChinh" class="hide">
+ <div class="card top"><span>👤 <b id="ten"></b> · Kỳ <b id="ky"></b></span><span id="tien"></span></div>
+ <div id="canhBao"></div>
+
+ <div id="vNhap" class="hide">
+  <div class="card">
+   <span class="sap" id="sap"></span><span class="loai" id="loai"></span>
+   <div class="ten" id="tenKH"></div><div class="kv" id="kv"></div>
+   <div class="cu"><div><span>Chỉ số cũ</span><b id="cu">-</b></div><div><span>Trung bình 3 kỳ</span><b id="tb">-</b></div></div>
+  </div>
+  <div class="card"><h1>CHỈ SỐ MỚI TRÊN ĐỒNG HỒ</h1>
+   <div class="big" id="to"></div>
+   <input id="so" type="tel" inputmode="decimal" autocomplete="off" placeholder="Gõ số">
+   <div id="tt" class="msg hide"></div>
+   <label class="k"><input type="checkbox" id="qv"> Đồng hồ quay vòng / mới thay</label>
+   <input id="gc" type="text" class="nho" placeholder="Ghi chú (hỏng, mờ, nhà đóng cửa…)">
+   <input id="vt" type="text" class="nho hide" placeholder="Vị trí đồng hồ (bắt buộc: cạnh quầy…, dãy…)">
+   <button id="luu">LƯU</button>
+   <button class="p" id="huy">Chọn sạp khác</button>
+   <div id="kq"></div>
+  </div>
+ </div>
+
+ <div id="vChon">
+  <div class="card"><h1>TÌM SẠP (gõ ký tự đầu của mã)</h1>
+   <input id="tim" type="text" autocomplete="off" autocapitalize="characters" placeholder="Ví dụ: F, F1, A2…">
+   <div id="gy"></div>
+   <div class="tabs"><button id="tKV" class="on">Theo khu vực</button><button id="tCG">Chưa ghi</button></div>
+   <select id="kvSel" class="nho" style="font-size:18px"></select>
+   <div id="dsKV"></div>
+  </div>
+ </div>
+
+ <div class="card"><h1>ĐÃ GHI TRÊN MÁY NÀY</h1><div id="ds" class="s">Chưa có.</div>
+  <button class="p" id="gui">Gửi lại các số chưa gửi được</button>
+  <button class="p" id="dx" style="background:#c92a2a">Đăng xuất</button></div>
 </div>
-<div class="card" id="nguoiBox" style="display:none"><h1>TÊN NGƯỜI GHI (nhập một lần)</h1>
- <input id="nguoi" type="text" style="font-size:22px" placeholder="Ví dụ: Tuấn"></div>
-<div class="card"><h1>ĐÃ GHI TRÊN MÁY NÀY (kỳ <span id="ky2">…</span>)</h1>
- <div id="ds" class="s">Chưa có.</div>
- <button class="p" id="gui">Gửi lại các số chưa gửi được</button></div>
+
 </div>
 <script>
 var API = "https://script.google.com/macros/s/AKfycbygXm3ylvmNOsu5Zjv3ZBbz66bi830MF4TjR1LjLbSvFOacxAhlNpOEIpv4HXnjvgM6/exec";
-var KEY = "cs_ds", KN = "cs_nguoi", KK = "cs_ky";
+var K_PIN="cs_pin",K_TEN="cs_ten",K_DS="cs_dl",K_Q="cs_q";
 function $(i){return document.getElementById(i)}
-function doc(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
-function ghi(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-var ky = doc(KK,""), ds = doc(KEY,[]), sap="", loai="";
-function tham(){
-  var q = decodeURIComponent((location.search||"").replace(/^\?/,"")).trim().toUpperCase();
-  var m = q.match(/^([A-Z0-9]+)[\-|_.]?([DN])$/);
-  if(!m) return false; sap=m[1]; loai=m[2]; return true;
+function doc(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}}
+function ghiLS(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function xoaLS(k){try{localStorage.removeItem(k)}catch(e){}}
+function an(i){$(i).classList.add("hide")}function hien(i){$(i).classList.remove("hide")}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function fmt(n){return n==null||n===""?"-":Number(n).toLocaleString("vi-VN")}
+
+var D={ky:"",mo:false,kyDK:"",ngay:2,ds:[]}, cur=null, pin="", ten="", thamSo=null;
+var queue=doc(K_Q,[]);
+
+function goi(body){
+  body.pin=pin;
+  return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)})
+   .then(function(r){return r.json()});
 }
-function ve(){
-  $("ky").textContent=$("ky2").textContent=ky||"…";
-  var h=""; var dem=0;
-  ds.slice().reverse().forEach(function(x){
-    if(x.ky!==ky) return;
-    h+='<div class="row"><span><b>'+x.sap+'</b> '+(x.loai==="D"?"Điện":"Nước")+': <b>'+x.moi+'</b></span><span>'+(x.ok?"✓":"⏳ chưa gửi")+'</span></div>';
-    if(!x.ok) dem++;
+
+// ---------- đăng nhập ----------
+function hienDN(msg){
+  an("vChinh");hien("vDN");
+  if(msg){$("kqDN").className="msg er";$("kqDN").textContent=msg}
+}
+$("bDN").onclick=function(){
+  var p=$("dnPin").value.trim(), t=$("dnTen").value.trim();
+  if(!/^\d{4,8}$/.test(p)){$("kqDN").className="msg er";$("kqDN").textContent="PIN gồm 4–8 chữ số.";return}
+  pin=p;$("bDN").disabled=true;$("kqDN").className="msg";$("kqDN").textContent="Đang kiểm tra…";
+  goi({a:"dn"}).then(function(j){
+    $("bDN").disabled=false;
+    if(j.ok){ghiLS(K_PIN,p);ghiLS(K_TEN,j.ten);ten=j.ten;an("vDN");vaoChinh()}
+    else{pin="";$("kqDN").className="msg er";$("kqDN").textContent=j.loi||"Không đăng nhập được"}
+  }).catch(function(){$("bDN").disabled=false;pin="";$("kqDN").className="msg er";$("kqDN").textContent="Không có mạng. Thử lại khi có sóng."});
+};
+$("dx").onclick=function(){if(confirm("Đăng xuất khỏi máy này?")){xoaLS(K_PIN);xoaLS(K_TEN);pin="";hienDN()}};
+
+// ---------- tải danh sách ----------
+function vaoChinh(){
+  hien("vChinh");
+  $("ten").textContent=ten;
+  var c=doc(K_DS,null); if(c){D=c;dungDS()}
+  goi({a:"ds"}).then(function(j){
+    if(j.ok){D={ky:j.ky,mo:j.mo,kyDK:j.kyDauKy,ngay:j.ngay||2,ds:j.ds};ghiLS(K_DS,D);ten=j.ten;dungDS()}
+    else if(j.pin===false){xoaLS(K_PIN);xoaLS(K_DS);pin="";hienDN("PIN không còn hiệu lực. Nhập lại PIN mới.")}
+    else{canh("er",j.loi||"Lỗi máy chủ")}
+  }).catch(function(){if(!c)canh("wa","Chưa có mạng và chưa có danh sách lưu trên máy. Hãy mở trang khi có sóng.");else canh("wa","Đang dùng danh sách lưu trên máy (không có mạng).")});
+  guiTat();
+}
+function canh(cl,t){$("canhBao").innerHTML='<div class="msg '+cl+'">'+esc(t)+'</div>'}
+function dungDS(){
+  $("ky").textContent=D.ky;
+  var m="";
+  if(!D.mo) m="Đợt ghi đang ĐÓNG – chưa lưu được số mới. Liên hệ quản lý.";
+  else if(D.kyDK&&D.kyDK!==D.ky) m="Danh sách chỉ số cũ thuộc kỳ "+D.kyDK+", khác kỳ ghi "+D.ky+". Báo quản lý kiểm tra trước khi ghi.";
+  if(m)canh(D.mo?"wa":"er",m);else $("canhBao").innerHTML="";
+  dungKV();veTien();veDS();
+  if(thamSo&&!cur){var x=tim(thamSo.sap,thamSo.loai);thamSo=null;if(x)mo(x);else{ $("tim").value="";}}
+  gy();
+}
+function daGhiMay(sap,loai){var r=null;queue.forEach(function(q){if(q.ky===D.ky&&q.sap===sap&&q.loai===loai)r=q.moi});return r}
+function tim(sap,loai){for(var i=0;i<D.ds.length;i++)if(D.ds[i][0]===sap&&D.ds[i][1]===loai)return D.ds[i];return null}
+function veTien(){
+  var n=D.ds.length,d=0;D.ds.forEach(function(x){if(x[6]!==""||daGhiMay(x[0],x[1])!==null)d++});
+  $("tien").textContent=n?("Đã ghi "+d+"/"+n):"";
+}
+
+// ---------- chọn sạp ----------
+var tabCG=false;
+function dungKV(){
+  var s={},o='<option value="">Chọn khu vực…</option>',old=$("kvSel").value;
+  D.ds.forEach(function(x){s[x[3]]=1});
+  Object.keys(s).sort().forEach(function(k){o+='<option>'+esc(k)+'</option>'});
+  $("kvSel").innerHTML=o;$("kvSel").value=old;veKV();
+}
+function nhom(list){ // gộp D/N theo sạp
+  var m={},ord=[];list.forEach(function(x){if(!m[x[0]]){m[x[0]]=[];ord.push(x[0])}m[x[0]].push(x)});
+  return ord.map(function(k){return m[k]});
+}
+function tuNhien(a,b){return a.localeCompare(b,"vi",{numeric:true})}
+function chipHtml(x){
+  var da=(x[6]!==""||daGhiMay(x[0],x[1])!==null);
+  return '<button class="chip'+(da?' da':'')+'" data-s="'+esc(x[0])+'" data-l="'+x[1]+'"><span class="loai '+x[1]+'" style="font-size:14px;margin:0 8px 0 0">'+(x[1]==="D"?"ĐIỆN":"NƯỚC")+'</span>'+esc(x[0])+(da?' ✓':'')+'<small>'+esc(x[2])+' · '+esc(x[3])+'</small></button>';
+}
+function veKV(){
+  var kv=$("kvSel").value,h="";
+  var l=D.ds.filter(function(x){return (!kv||x[3]===kv)&&(!tabCG||(x[6]===""&&daGhiMay(x[0],x[1])===null))});
+  l.sort(function(a,b){return tuNhien(a[0],b[0])||(a[1]<b[1]?-1:1)});
+  if(!kv&&!tabCG){$("dsKV").innerHTML='<p class="s">Chọn khu vực để xem danh sách sạp.</p>';return}
+  l.slice(0,120).forEach(function(x){h+=chipHtml(x)});
+  $("dsKV").innerHTML=h||'<p class="s">Không còn sạp nào.</p>';
+}
+$("tKV").onclick=function(){tabCG=false;$("tKV").classList.add("on");$("tCG").classList.remove("on");veKV()};
+$("tCG").onclick=function(){tabCG=true;$("tCG").classList.add("on");$("tKV").classList.remove("on");veKV()};
+$("kvSel").onchange=veKV;
+function gy(){
+  var q=$("tim").value.trim().toUpperCase().replace(/\s+/g,""),h="";
+  if(!q){$("gy").innerHTML="";return}
+  var l=D.ds.filter(function(x){return x[0].indexOf(q)===0});
+  if(!l.length)l=D.ds.filter(function(x){return x[0].indexOf(q)>0});
+  l.sort(function(a,b){return tuNhien(a[0],b[0])||(a[1]<b[1]?-1:1)});
+  l.slice(0,10).forEach(function(x){h+=chipHtml(x)});
+  if(!l.length)h='<div class="msg wa">Không có mã "'+esc(q)+'" trong danh sách.</div>';
+  h+='<button class="chip" id="khac" style="border-style:dashed">Ghi mã không có trong danh sách…</button>';
+  $("gy").innerHTML=h;
+}
+$("tim").oninput=gy;
+document.addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest(".chip");if(!b)return;
+  if(b.id==="khac"){moKhac();return}
+  var x=tim(b.getAttribute("data-s"),b.getAttribute("data-l"));if(x)mo(x);
+});
+
+// ---------- nhập số ----------
+function mo(x){
+  cur={sap:x[0],loai:x[1],ten:x[2],kv:x[3],cu:x[4],tb:x[5],khac:false};
+  hienNhap();
+}
+function moKhac(){
+  var q=$("tim").value.trim().toUpperCase().replace(/\s+/g,"");
+  var s=prompt("Gõ mã sạp ghi trên đồng hồ:",q);if(!s)return;
+  var l=(prompt("Loại đồng hồ: gõ D (điện) hoặc N (nước)","D")||"").trim().toUpperCase().charAt(0);
+  if(l!=="D"&&l!=="N")return;
+  cur={sap:s.toUpperCase().replace(/\s+/g,""),loai:l,ten:"(mã chưa có trong danh sách)",kv:"",cu:null,tb:0,khac:true};
+  hienNhap();
+}
+function hienNhap(){
+  an("vChon");hien("vNhap");
+  $("sap").textContent=cur.sap;$("loai").textContent=cur.loai==="D"?"ĐIỆN":"NƯỚC";$("loai").className="loai "+cur.loai;
+  $("tenKH").textContent=cur.ten;$("kv").textContent=cur.kv;
+  $("cu").textContent=fmt(cur.cu);$("tb").textContent=cur.tb?fmt(cur.tb):"-";
+  $("so").value="";$("to").textContent="";$("gc").value="";$("vt").value="";$("qv").checked=false;$("kq").innerHTML="";an("tt");
+  if(cur.khac){hien("vt")}else an("vt");
+  var dm=daGhiMay(cur.sap,cur.loai); if(dm!==null)$("kq").innerHTML='<div class="msg wa">Máy này đã ghi: '+esc(dm)+'. Lưu lần nữa sẽ ghi đè.</div>';
+  setTimeout(function(){$("so").focus()},200);
+}
+$("huy").onclick=function(){cur=null;an("vNhap");hien("vChon");$("tim").value="";gy()};
+function danhGia(){
+  var v=$("so").value.trim().replace(",","."),r={ok:false,muc:"",msg:"",canGC:false};
+  if(!/^\d{1,9}(\.\d{1,3})?$/.test(v)){return r}
+  var m=parseFloat(v);r.ok=true;
+  if(cur.khac||cur.cu==null){r.muc="wa";r.msg="Không có chỉ số cũ để so sánh.";return r}
+  var qv=$("qv").checked,tt=m-cur.cu;
+  if(m<cur.cu&&!qv){r.ok=false;r.muc="er";r.msg="Số mới nhỏ hơn số cũ ("+fmt(cur.cu)+"). Gõ lại. Nếu đồng hồ quay vòng/mới thay thì tích ô bên dưới.";return r}
+  if(qv){r.muc="wa";r.msg="Đồng hồ quay vòng/mới thay: bắt buộc ghi chú.";r.canGC=true;return r}
+  r.muc="ok";r.msg="Tiêu thụ: "+fmt(tt);
+  if(cur.tb>0&&tt>D.ngay*cur.tb){r.muc="wa";r.msg="Tiêu thụ "+fmt(tt)+" cao hơn "+D.ngay+" lần trung bình ("+fmt(cur.tb)+"). Kiểm tra lại số và ghi lý do.";r.canGC=true}
+  else if(cur.tb>5&&tt===0){r.muc="wa";r.msg="Tiêu thụ bằng 0 trong khi trung bình "+fmt(cur.tb)+". Xem lại đồng hồ và ghi lý do.";r.canGC=true}
+  else if(cur.cu>=100&&m>=cur.cu*10){r.muc="wa";r.msg="Số mới gấp 10 lần số cũ, có thể thừa số 0. Kiểm tra lại.";r.canGC=true}
+  return r;
+}
+$("so").addEventListener("input",function(){
+  this.value=this.value.replace(/[^0-9.,]/g,"");$("to").textContent=this.value;
+  var r=danhGia();if(r.msg){hien("tt");$("tt").className="msg "+r.muc;$("tt").textContent=r.msg}else an("tt");
+});
+$("qv").onchange=function(){$("so").dispatchEvent(new Event("input"))};
+$("luu").onclick=function(){
+  var kq=$("kq");
+  if(!D.mo){kq.innerHTML='<div class="msg er">Đợt ghi đang đóng.</div>';return}
+  var r=danhGia();
+  if(!r.ok){kq.innerHTML='<div class="msg er">'+esc(r.msg||"Chỉ số chưa đúng. Chỉ gõ số.")+'</div>';return}
+  var gc=$("gc").value.trim(),vt=$("vt").value.trim();
+  if(cur.khac){if(!vt){kq.innerHTML='<div class="msg er">Hãy ghi vị trí đồng hồ để nhân viên văn phòng đối chiếu.</div>';return}gc=("VỊ TRÍ: "+vt+(gc?" | "+gc:""))}
+  else if((r.canGC||$("qv").checked)&&!gc){kq.innerHTML='<div class="msg er">Cần ghi chú lý do (ô ghi chú bên trên).</div>';return}
+  var dm=daGhiMay(cur.sap,cur.loai);
+  if(dm!==null&&!$("luu").dataset.xn){kq.innerHTML='<div class="msg wa">Đã ghi '+esc(dm)+'. Bấm LƯU lần nữa để ghi đè.</div>';$("luu").dataset.xn="1";return}
+  delete $("luu").dataset.xn;
+  var x={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),a:"ghi",sap:cur.sap,loai:cur.loai,moi:$("so").value.trim().replace(",","."),ghichu:gc,qv:$("qv").checked,ky:D.ky,ok:false};
+  queue.push(x);ghiLS(K_Q,queue);
+  $("luu").disabled=true;kq.innerHTML='<div class="msg">Đang gửi…</div>';
+  guiMot(x).then(function(res){
+    ghiLS(K_Q,queue);$("luu").disabled=false;veTien();veDS();
+    if(res.ok){
+      var l=tim(x.sap,x.loai);if(l)l[6]=x.moi;ghiLS(K_DS,D);
+      cur=null;an("vNhap");hien("vChon");$("tim").value="";gy();veKV();
+      $("canhBao").innerHTML='<div class="msg ok">✓ Đã lưu '+esc(x.sap)+" "+(x.loai==="D"?"điện":"nước")+': <b>'+esc(x.moi)+'</b>. Quét tem tiếp theo.</div>';
+      window.scrollTo(0,0);
+    }else if(res.cuoi){
+      queue=queue.filter(function(q){return q!==x});ghiLS(K_Q,queue);veTien();veDS();
+      kq.innerHTML='<div class="msg er">'+esc(res.loi)+'</div>';
+    }else{
+      kq.innerHTML='<div class="msg wa">Đã nhớ trên máy nhưng chưa gửi được ('+esc(res.loi)+'). Có mạng sẽ tự gửi lại.</div>';
+    }
   });
-  $("ds").innerHTML=h||"Chưa có."; $("gui").style.display=dem?"block":"none";
-}
-function gui(x){
-  return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(x)})
-   .then(function(r){return r.json()}).then(function(j){
-     if(j.ok){x.ok=true; if(j.ky){x.ky=j.ky;} return {ok:true}}
-     return {ok:false,loi:j.loi||"Lỗi máy chủ"}
-   }).catch(function(){return {ok:false,loi:"Không có mạng hoặc máy chủ chưa phản hồi"}});
+};
+function guiMot(x){
+  return goi(x).then(function(j){
+    if(j.ok){x.ok=true;return {ok:true}}
+    if(j.pin===false){return {ok:false,cuoi:false,loi:"PIN không còn hiệu lực"}}
+    return {ok:false,cuoi:true,loi:j.loi||"Lỗi máy chủ"}
+  }).catch(function(){return {ok:false,cuoi:false,loi:"Không có mạng"}});
 }
 function guiTat(){
-  var chua=ds.filter(function(x){return !x.ok});
-  var p=Promise.resolve();
-  chua.forEach(function(x){p=p.then(function(){return gui(x)})});
-  return p.then(function(){ghi(KEY,ds);ve()});
-}
-function khoiDong(){
-  if(!API||API.indexOf("__")===0){$("cho").style.display="block";$("cho").innerHTML="<p>Trang chưa được cấu hình địa chỉ nhận dữ liệu.</p>";return}
-  fetch(API).then(function(r){return r.json()}).then(function(j){if(j&&j.ky){ky=j.ky;ghi(KK,ky)}ve()}).catch(function(){ve()});
-  var ng=doc(KN,""); $("nguoi").value=ng;
-  if(tham()){
-    $("nhap").style.display="block"; $("sap").textContent=sap;
-    $("loai").textContent=loai==="D"?"ĐIỆN":"NƯỚC"; $("loai").className="loai "+loai;
-    if(!ng) $("nguoiBox").style.display="block";
-    $("so").addEventListener("input",function(){
-      this.value=this.value.replace(/[^0-9.,]/g,""); $("to").textContent=this.value;});
-    $("luu").onclick=luu;
-    setTimeout(function(){$("so").focus()},300);
-  } else { $("cho").style.display="block"; }
-  ve();
-  if(ds.some(function(x){return !x.ok})) guiTat();
-}
-function luu(){
-  var v=$("so").value.trim().replace(",","."); var kq=$("kq");
-  var ng=$("nguoi").value.trim();
-  if(!ng){kq.className="msg er";kq.textContent="Hãy nhập tên người ghi ở ô bên dưới.";$("nguoiBox").style.display="block";return}
-  if(!/^\d{1,9}(\.\d{1,3})?$/.test(v)){kq.className="msg er";kq.textContent="Chỉ số chưa đúng. Chỉ gõ số.";return}
-  ghi(KN,ng);
-  var trungCu=ds.filter(function(x){return x.ky===ky&&x.sap===sap&&x.loai===loai});
-  if(trungCu.length && !$("luu").dataset.xn){
-    kq.className="msg wa";kq.textContent="Đồng hồ này đã ghi: "+trungCu[trungCu.length-1].moi+". Bấm LƯU lần nữa để ghi đè.";
-    $("luu").dataset.xn="1";return}
-  $("luu").disabled=true;
-  var x={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),sap:sap,loai:loai,moi:v,ghichu:$("gc").value,nguoi:ng,ky:ky,ok:false};
-  ds.push(x); ghi(KEY,ds);
-  kq.className="msg";kq.textContent="Đang gửi…";
-  gui(x).then(function(r){
-    ghi(KEY,ds);ve();$("luu").disabled=false;delete $("luu").dataset.xn;
-    if(r.ok){kq.className="msg ok";kq.innerHTML="✓ Đã lưu "+sap+" "+(loai==="D"?"điện":"nước")+": <b>"+v+"</b><br>Quét tem tiếp theo bằng Camera.";$("so").value="";$("to").textContent="";$("so").blur()}
-    else{kq.className="msg wa";kq.textContent="Đã nhớ trên máy nhưng chưa gửi được ("+r.loi+"). Có mạng sẽ tự gửi lại khi mở trang.";}
-  });
+  var chua=queue.filter(function(x){return !x.ok}),p=Promise.resolve();
+  chua.forEach(function(x){p=p.then(function(){return guiMot(x).then(function(r){if(r.cuoi){x.loiMayChu=r.loi;x.ok=true}})})});
+  return p.then(function(){ghiLS(K_Q,queue);veTien();veDS()});
 }
 $("gui").onclick=guiTat;
-khoiDong();
+function veDS(){
+  var h="",dem=0;
+  queue.slice().reverse().forEach(function(x){
+    if(x.ky!==D.ky)return;
+    var tr=x.loiMayChu?'<span style="color:#c92a2a">bị từ chối</span>':(x.ok?"✓":"⏳ chưa gửi");
+    h+='<div class="row"><span><b>'+esc(x.sap)+'</b> '+(x.loai==="D"?"Điện":"Nước")+': <b>'+esc(x.moi)+'</b></span><span>'+tr+'</span></div>';
+    if(!x.ok)dem++;
+  });
+  $("ds").innerHTML=h||"Chưa có.";$("gui").style.display=dem?"block":"none";
+}
+
+// ---------- khởi động ----------
+(function(){
+  if(!API||API.indexOf("__")===0){hien("vDN");$("vDN").innerHTML="<p>Trang chưa được cấu hình.</p>";return}
+  var q=decodeURIComponent((location.search||"").replace(/^\?/,"")).trim().toUpperCase();
+  var m=q.match(/^([A-Z0-9]+)[\-|_.]?([DN])$/);if(m)thamSo={sap:m[1],loai:m[2]};
+  pin=doc(K_PIN,"");ten=doc(K_TEN,"");
+  if(!pin){hienDN();return}
+  vaoChinh();
+})();
 </script></body></html>
