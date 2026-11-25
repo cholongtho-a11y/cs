@@ -34,6 +34,7 @@ button:disabled{background:#bbb}
 label.k{display:flex;gap:10px;align-items:center;font-size:17px;margin-top:10px}label.k input{width:24px;height:24px}
 .tabs{display:flex;gap:8px;margin-top:8px}.tabs button{margin:0;padding:10px;font-size:16px;background:#dee2e6;color:#333}.tabs button.on{background:#2b6cb0;color:#fff}
 .hide{display:none}
+label.qr2{display:block;text-align:center;background:#495057;color:#fff;font-weight:700;font-size:18px;padding:13px;border-radius:12px;margin-top:10px}
 button.qr{background:#2b6cb0;font-size:24px;padding:18px;margin-top:0}
 #cam{position:fixed;inset:0;background:#000;z-index:99;display:flex;flex-direction:column}
 #cam video{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;background:#000}
@@ -56,7 +57,7 @@ button.qr{background:#2b6cb0;font-size:24px;padding:18px;margin-top:0}
 </div>
 
 <div id="vChinh" class="hide">
- <div class="card top"><span>👤 <b id="ten"></b> · Kỳ <b id="ky"></b></span><span id="tien"></span></div>
+ <div class="card top"><span>👤 <b id="ten"></b> · Kỳ <b id="ky"></b> <small style="color:#999">v2.2</small></span><span id="tien"></span></div>
  <div id="canhBao"></div>
 
  <div id="vNhap" class="hide">
@@ -80,6 +81,7 @@ button.qr{background:#2b6cb0;font-size:24px;padding:18px;margin-top:0}
 
  <div id="vChon">
   <div class="card"><button class="qr" id="bQuet">📷 QUÉT TEM BẰNG CAMERA</button>
+   <label class="qr2" id="bAnh">📸 Chụp ảnh tem (cách dự phòng)<input type="file" id="camF2" accept="image/*" capture="environment" style="display:none"></label>
    <label class="k"><input type="checkbox" id="tuMo"> Tự mở camera sau mỗi lần lưu</label></div>
   <div class="card"><h1>TÌM SẠP (gõ ký tự đầu của mã)</h1>
    <input id="tim" type="text" autocomplete="off" autocapitalize="characters" placeholder="Ví dụ: F, F1, A2…">
@@ -332,20 +334,28 @@ function dongCam(){
   $("camV").srcObject=null;an("cam");
 }
 function moCam(){
-  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){alert("Trình duyệt không mở được camera. Hãy dùng Safari và cho phép camera, hoặc quét bằng ứng dụng Camera như cũ.");return}
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){alert("Trình duyệt không mở được camera. Hãy dùng nút Chụp ảnh tem.");return}
   hien("cam");$("camTop").textContent="Đang mở camera…";
+  var v=$("camV");v.muted=true;v.playsInline=true;v.setAttribute("muted","");v.setAttribute("playsinline","");v.setAttribute("webkit-playsinline","");
   napJsQR().then(function(){
-    return navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
+    return navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"},audio:false}).catch(function(e){
+      if(e&&e.name==="NotAllowedError")throw e;
+      return navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    });
   }).then(function(st){
-    camStream=st;var v=$("camV");v.srcObject=st;v.setAttribute("playsinline","");
-    return v.play();
-  }).then(function(){
-    $("camTop").textContent="Hướng camera vào tem QR trên đồng hồ";camChay=true;quetKhung();
-    setTimeout(function(){var v=$("camV");if(camChay&&!v.videoWidth)$("camTop").textContent="Camera chưa có hình. Bấm “Chụp ảnh tem” bên dưới hoặc đóng và thử lại."},2500);
+    camStream=st;v.srcObject=st;camChay=true;
+    var p=v.play();if(p&&p.catch)p.catch(function(){});
+    var t0=Date.now();
+    (function chk(){
+      if(!camChay)return;
+      var tr=st.getVideoTracks()[0],th=tr?(tr.readyState+(tr.muted?"/muted":"")):"không có track";
+      if(v.videoWidth>0&&v.readyState>=2){$("camTop").textContent="Hướng camera vào tem QR trên đồng hồ";quetKhung();return}
+      if(Date.now()-t0>4000){$("camTop").textContent="Camera chưa có hình ["+th+", "+v.videoWidth+"x"+v.videoHeight+", rs"+v.readyState+"]. Bấm “Chụp ảnh tem”.";return}
+      setTimeout(chk,200);
+    })();
   }).catch(function(e){
-    dongCam();
     var n=e&&e.name;
-    alert(n==="NotAllowedError"?"Chưa cho phép camera. Vào Cài đặt > Safari > Camera, chọn Cho phép (hoặc bấm aA trên thanh địa chỉ > Cài đặt trang web > Camera).":"Không mở được camera ("+(n||"lỗi")+"). Quét bằng ứng dụng Camera như cũ.");
+    $("camTop").textContent=n==="NotAllowedError"?"Chưa cho phép camera. Vào Cài đặt > Safari > Camera, chọn Cho phép.":"Không mở được camera ("+(n||"lỗi")+"). Bấm “Chụp ảnh tem”.";
   });
 }
 function quetKhung(){
@@ -380,7 +390,7 @@ function xuLyMa(text){
   if(x){cur=null;mo(x)}else moKhacTu(m);
   return true;
 }
-$("camF").onchange=function(){
+$("camF").onchange=$("camF2").onchange=function(){
   var f=this.files&&this.files[0];this.value="";if(!f)return;
   $("camTop").textContent="Đang đọc ảnh…";
   napJsQR().then(function(){
