@@ -139,7 +139,7 @@ function doPost(e) {
   var lock = LockService.getScriptLock();
   try {
     lock.waitLock(20000);
-    var d = JSON.parse(e.postData.contents), a = String(d.a || 'ghi');
+    var raw = String(e.postData.contents), d = JSON.parse(raw.substring(Math.max(raw.indexOf('{'), 0))), a = String(d.a || 'ghi');
     if (a === 'dauky') {
       var kh = cau_('B3');
       if (!kh || String(d.k || '') !== kh) return json_({ ok: false, loi: 'Sai khoa' });
