@@ -34,6 +34,12 @@ button:disabled{background:#bbb}
 label.k{display:flex;gap:10px;align-items:center;font-size:17px;margin-top:10px}label.k input{width:24px;height:24px}
 .tabs{display:flex;gap:8px;margin-top:8px}.tabs button{margin:0;padding:10px;font-size:16px;background:#dee2e6;color:#333}.tabs button.on{background:#2b6cb0;color:#fff}
 .hide{display:none}
+button.qr{background:#2b6cb0;font-size:24px;padding:18px;margin-top:0}
+#cam{position:fixed;inset:0;background:#000;z-index:99;display:flex;flex-direction:column}
+#cam video{flex:1;width:100%;min-height:0;object-fit:cover}
+#camTop{position:absolute;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;background:linear-gradient(#000a,#0000);color:#fff;font-size:18px;text-align:center}
+#camKhung{position:absolute;left:50%;top:50%;width:64vmin;height:64vmin;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:18px;box-shadow:0 0 0 100vmax #0006;pointer-events:none}
+#camDong{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 16px);background:#c92a2a}
 </style></head><body><div class="w">
 
 <div id="vDN" class="card hide">
@@ -71,6 +77,8 @@ label.k{display:flex;gap:10px;align-items:center;font-size:17px;margin-top:10px}
  </div>
 
  <div id="vChon">
+  <div class="card"><button class="qr" id="bQuet">📷 QUÉT TEM BẰNG CAMERA</button>
+   <label class="k"><input type="checkbox" id="tuMo"> Tự mở camera sau mỗi lần lưu</label></div>
   <div class="card"><h1>TÌM SẠP (gõ ký tự đầu của mã)</h1>
    <input id="tim" type="text" autocomplete="off" autocapitalize="characters" placeholder="Ví dụ: F, F1, A2…">
    <div id="gy"></div>
@@ -86,6 +94,10 @@ label.k{display:flex;gap:10px;align-items:center;font-size:17px;margin-top:10px}
 </div>
 
 </div>
+<div id="cam" class="hide"><video id="camV" playsinline muted autoplay></video><div id="camKhung"></div>
+ <div id="camTop">Hướng camera vào tem QR trên đồng hồ</div>
+ <button id="camDong">ĐÓNG CAMERA</button></div>
+<canvas id="camC" class="hide"></canvas>
 <script>
 var API = "https://script.google.com/macros/s/AKfycbygXm3ylvmNOsu5Zjv3ZBbz66bi830MF4TjR1LjLbSvFOacxAhlNpOEIpv4HXnjvgM6/exec";
 var K_PIN="cs_pin",K_TEN="cs_ten",K_DS="cs_dl",K_Q="cs_q";
@@ -263,6 +275,7 @@ $("luu").onclick=function(){
       cur=null;an("vNhap");hien("vChon");$("tim").value="";gy();veKV();
       $("canhBao").innerHTML='<div class="msg ok">✓ Đã lưu '+esc(x.sap)+" "+(x.loai==="D"?"điện":"nước")+': <b>'+esc(x.moi)+'</b>. Quét tem tiếp theo.</div>';
       window.scrollTo(0,0);
+      if($("tuMo").checked)setTimeout(moCam,350);
     }else if(res.cuoi){
       queue=queue.filter(function(q){return q!==x});ghiLS(K_Q,queue);veTien();veDS();
       kq.innerHTML='<div class="msg er">'+esc(res.loi)+'</div>';
@@ -294,6 +307,73 @@ function veDS(){
   });
   $("ds").innerHTML=h||"Chưa có.";$("gui").style.display=dem?"block":"none";
 }
+
+
+// ---------- quét tem QR bằng camera trong trang ----------
+var K_AUTO="cs_tumo",camStream=null,camChay=false,jsqrNap=null;
+function napJsQR(){
+  if(window.jsQR)return Promise.resolve();
+  if(jsqrNap)return jsqrNap;
+  jsqrNap=new Promise(function(ok,loi){var e=document.createElement("script");e.src="jsQR.js?v=1";e.onload=ok;e.onerror=function(){jsqrNap=null;loi(new Error("jsqr"))};document.head.appendChild(e)});
+  return jsqrNap;
+}
+function tachMa(t){
+  var q=String(t||"");var i=q.indexOf("?");if(i>=0)q=q.slice(i+1);
+  q=decodeURIComponent(q).trim().toUpperCase();
+  var m=q.match(/^([A-Z0-9]+)[\-|_.]?([DN])$/);
+  return m?{sap:m[1],loai:m[2]}:null;
+}
+function dongCam(){
+  camChay=false;
+  if(camStream){camStream.getTracks().forEach(function(t){t.stop()});camStream=null}
+  $("camV").srcObject=null;an("cam");
+}
+function moCam(){
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){alert("Trình duyệt không mở được camera. Hãy dùng Safari và cho phép camera, hoặc quét bằng ứng dụng Camera như cũ.");return}
+  hien("cam");$("camTop").textContent="Đang mở camera…";
+  napJsQR().then(function(){
+    return navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
+  }).then(function(st){
+    camStream=st;var v=$("camV");v.srcObject=st;v.setAttribute("playsinline","");
+    return v.play();
+  }).then(function(){
+    $("camTop").textContent="Hướng camera vào tem QR trên đồng hồ";camChay=true;quetKhung();
+  }).catch(function(e){
+    dongCam();
+    var n=e&&e.name;
+    alert(n==="NotAllowedError"?"Chưa cho phép camera. Vào Cài đặt > Safari > Camera, chọn Cho phép (hoặc bấm aA trên thanh địa chỉ > Cài đặt trang web > Camera).":"Không mở được camera ("+(n||"lỗi")+"). Quét bằng ứng dụng Camera như cũ.");
+  });
+}
+function quetKhung(){
+  if(!camChay)return;
+  var v=$("camV"),c=$("camC");
+  if(v.readyState>=2&&v.videoWidth){
+    var w=Math.min(720,v.videoWidth),h=Math.round(v.videoHeight*w/v.videoWidth);
+    c.width=w;c.height=h;var g=c.getContext("2d",{willReadFrequently:true});g.drawImage(v,0,0,w,h);
+    var r=window.jsQR(g.getImageData(0,0,w,h).data,w,h,{inversionAttempts:"attemptBoth"});
+    if(r&&r.data){
+      var m=tachMa(r.data);
+      if(m){
+        var x=tim(m.sap,m.loai);
+        dongCam();
+        if(x){cur=null;mo(x)}
+        else{moKhacTu(m)}
+        return;
+      }else{$("camTop").textContent="Đây không phải tem đồng hồ. Quét lại."}
+    }
+  }
+  setTimeout(function(){requestAnimationFrame(quetKhung)},90);
+}
+function moKhacTu(m){
+  $("tim").value=m.sap;
+  cur={sap:m.sap,loai:m.loai,ten:"(mã chưa có trong danh sách)",kv:"",cu:null,tb:0,khac:true};
+  hienNhap();
+}
+$("bQuet").onclick=moCam;
+$("camDong").onclick=dongCam;
+$("tuMo").checked=doc(K_AUTO,false);
+$("tuMo").onchange=function(){ghiLS(K_AUTO,this.checked)};
+document.addEventListener("visibilitychange",function(){if(document.hidden&&camChay)dongCam()});
 
 // ---------- khởi động ----------
 (function(){
