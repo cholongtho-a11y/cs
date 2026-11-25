@@ -11,3 +11,8 @@ TRIEN KHAI (lam 1 lan)
 5. Trien khai > Quan ly trien khai > Sua > Phien ban moi > Trien khai (giu nguyen URL).
 6. Excel: GHI_CS > "1b. Gui DS dau ky" (hoac dan file CSV vao tab DauKy), roi nhan vien quet tem, nhap PIN mot lan.
 7. Sau khi ghi: GHI_CS > "3. Nap tu dong tu Google Sheet" > xu ly sheet KIEM_TRA_CS > Luu chi so.
+
+QUET TEM LIEN TUC (ban 2.1)
+- Tren trang ghi so bam nut xanh "QUET TEM BANG CAMERA", huong vao tem; trang tu mo dung sap. Khong can mo tab Camera moi.
+- Lan dau Safari hoi quyen camera: chon Cho phep. Tich "Tu mo camera sau moi lan luu" de camera tu bat sau khi luu.
+- Doc ma bang thu vien jsQR.js (cung thu muc, khong can mang ngoai). Sau khi cap nhat trang, xoa bo nho dem Safari neu van thay giao dien cu.
