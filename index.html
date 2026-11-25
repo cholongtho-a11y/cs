@@ -33,7 +33,7 @@ button:disabled{background:#bbb}
 .s{font-size:14px;color:#666}
 label.k{display:flex;gap:10px;align-items:center;font-size:17px;margin-top:10px}label.k input{width:24px;height:24px}
 .tabs{display:flex;gap:8px;margin-top:8px}.tabs button{margin:0;padding:10px;font-size:16px;background:#dee2e6;color:#333}.tabs button.on{background:#2b6cb0;color:#fff}
-.hide{display:none}
+.hide{display:none!important}
 label.qr2{display:block;text-align:center;background:#495057;color:#fff;font-weight:700;font-size:18px;padding:13px;border-radius:12px;margin-top:10px}
 button.qr{background:#2b6cb0;font-size:24px;padding:18px;margin-top:0}
 #cam{position:fixed;inset:0;background:#000;z-index:99;display:flex;flex-direction:column}
@@ -57,7 +57,7 @@ button.qr{background:#2b6cb0;font-size:24px;padding:18px;margin-top:0}
 </div>
 
 <div id="vChinh" class="hide">
- <div class="card top"><span>👤 <b id="ten"></b> · Kỳ <b id="ky"></b> <small style="color:#999">v2.2</small></span><span id="tien"></span></div>
+ <div class="card top"><span>👤 <b id="ten"></b> · Kỳ <b id="ky"></b> <small style="color:#999">v2.3</small></span><span id="tien"></span></div>
  <div id="canhBao"></div>
 
  <div id="vNhap" class="hide">
@@ -362,9 +362,9 @@ function quetKhung(){
   if(!camChay)return;
   var v=$("camV"),c=$("camC");
   if(v.readyState>=2&&v.videoWidth){
-    var w=Math.min(720,v.videoWidth),h=Math.round(v.videoHeight*w/v.videoWidth);
+    var w=Math.min(560,v.videoWidth),h=Math.round(v.videoHeight*w/v.videoWidth);
     c.width=w;c.height=h;var g=c.getContext("2d",{willReadFrequently:true});g.drawImage(v,0,0,w,h);
-    var r=window.jsQR(g.getImageData(0,0,w,h).data,w,h,{inversionAttempts:"attemptBoth"});
+    var r=window.jsQR(g.getImageData(0,0,w,h).data,w,h,{inversionAttempts:"dontInvert"});
     if(r&&r.data){
       var m=tachMa(r.data);
       if(m){
@@ -392,16 +392,26 @@ function xuLyMa(text){
 }
 $("camF").onchange=$("camF2").onchange=function(){
   var f=this.files&&this.files[0];this.value="";if(!f)return;
-  $("camTop").textContent="Đang đọc ảnh…";
+  hien("cam");$("camTop").textContent="Đang đọc ảnh…";
   napJsQR().then(function(){
     var img=new Image();img.onload=function(){
-      var c=$("camC"),k=1600/Math.max(img.width,img.height);if(k>1)k=1;
-      var w=Math.round(img.width*k),h=Math.round(img.height*k);c.width=w;c.height=h;
-      var g=c.getContext("2d",{willReadFrequently:true});g.drawImage(img,0,0,w,h);
-      var r=window.jsQR(g.getImageData(0,0,w,h).data,w,h,{inversionAttempts:"attemptBoth"});
+      var c=$("camC"),g=c.getContext("2d",{willReadFrequently:true}),r=null;
+      var W=img.width,H=img.height,m=null;
+      var tries=[];[2000,1200,800,500].forEach(function(mx){tries.push({mx:mx,crop:0});tries.push({mx:mx,crop:1})});
+      for(var i=0;i<tries.length&&!r;i++){
+        var t=tries[i],sx=0,sy=0,sw=W,sh=H;
+        if(t.crop){sx=W*0.2;sy=H*0.2;sw=W*0.6;sh=H*0.6}
+        var k=Math.min(1,t.mx/Math.max(sw,sh)),w=Math.round(sw*k),h=Math.round(sh*k);
+        c.width=w;c.height=h;g.drawImage(img,sx,sy,sw,sh,0,0,w,h);
+        r=window.jsQR(g.getImageData(0,0,w,h).data,w,h,{inversionAttempts:"attemptBoth"});
+        if(r&&r.data&&!tachMa(r.data)){m="other:"+r.data.slice(0,40);r=null}
+      }
       URL.revokeObjectURL(img.src);
-      if(!(r&&r.data&&xuLyMa(r.data)))$("camTop").textContent="Không đọc được tem trong ảnh. Chụp gần hơn, đủ sáng.";
-    };img.src=URL.createObjectURL(f);
+      if(r&&r.data&&xuLyMa(r.data))return;
+      $("camTop").textContent=m?"Đọc được mã nhưng không phải tem đồng hồ ("+m+")":"Không tìm thấy mã QR trong ảnh. Chụp cả tem, cách 15–25 cm, đủ sáng, rồi thử lại.";
+    };
+    img.onerror=function(){$("camTop").textContent="Không mở được ảnh vừa chụp. Thử lại."};
+    img.src=URL.createObjectURL(f);
   });
 };
 $("bQuet").onclick=moCam;
