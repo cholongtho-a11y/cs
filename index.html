@@ -36,10 +36,12 @@ label.k{display:flex;gap:10px;align-items:center;font-size:17px;margin-top:10px}
 .hide{display:none}
 button.qr{background:#2b6cb0;font-size:24px;padding:18px;margin-top:0}
 #cam{position:fixed;inset:0;background:#000;z-index:99;display:flex;flex-direction:column}
-#cam video{flex:1;width:100%;min-height:0;object-fit:cover}
+#cam video{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;background:#000}
 #camTop{position:absolute;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;background:linear-gradient(#000a,#0000);color:#fff;font-size:18px;text-align:center}
 #camKhung{position:absolute;left:50%;top:50%;width:64vmin;height:64vmin;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:18px;box-shadow:0 0 0 100vmax #0006;pointer-events:none}
-#camDong{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 16px);background:#c92a2a}
+#camDong{position:absolute;left:12px;width:calc(100% - 24px);bottom:calc(env(safe-area-inset-bottom) + 16px);background:#c92a2a}
+#camAnh{position:absolute;left:12px;width:calc(100% - 24px);bottom:calc(env(safe-area-inset-bottom) + 86px);background:#2b6cb0;display:block;text-align:center;font-size:20px;font-weight:700;padding:14px;border-radius:12px;color:#fff;margin:0}
+#camTop{z-index:3}#camKhung{z-index:2}#camDong,#camAnh{z-index:3}
 </style></head><body><div class="w">
 
 <div id="vDN" class="card hide">
@@ -96,6 +98,7 @@ button.qr{background:#2b6cb0;font-size:24px;padding:18px;margin-top:0}
 </div>
 <div id="cam" class="hide"><video id="camV" playsinline muted autoplay></video><div id="camKhung"></div>
  <div id="camTop">Hướng camera vào tem QR trên đồng hồ</div>
+ <label id="camAnh">📸 Hình không hiện? Chụp ảnh tem<input type="file" id="camF" accept="image/*" capture="environment" style="display:none"></label>
  <button id="camDong">ĐÓNG CAMERA</button></div>
 <canvas id="camC" class="hide"></canvas>
 <script>
@@ -338,6 +341,7 @@ function moCam(){
     return v.play();
   }).then(function(){
     $("camTop").textContent="Hướng camera vào tem QR trên đồng hồ";camChay=true;quetKhung();
+    setTimeout(function(){var v=$("camV");if(camChay&&!v.videoWidth)$("camTop").textContent="Camera chưa có hình. Bấm “Chụp ảnh tem” bên dưới hoặc đóng và thử lại."},2500);
   }).catch(function(e){
     dongCam();
     var n=e&&e.name;
@@ -369,6 +373,27 @@ function moKhacTu(m){
   cur={sap:m.sap,loai:m.loai,ten:"(mã chưa có trong danh sách)",kv:"",cu:null,tb:0,khac:true};
   hienNhap();
 }
+function xuLyMa(text){
+  var m=tachMa(text);
+  if(!m)return false;
+  dongCam();var x=tim(m.sap,m.loai);
+  if(x){cur=null;mo(x)}else moKhacTu(m);
+  return true;
+}
+$("camF").onchange=function(){
+  var f=this.files&&this.files[0];this.value="";if(!f)return;
+  $("camTop").textContent="Đang đọc ảnh…";
+  napJsQR().then(function(){
+    var img=new Image();img.onload=function(){
+      var c=$("camC"),k=1600/Math.max(img.width,img.height);if(k>1)k=1;
+      var w=Math.round(img.width*k),h=Math.round(img.height*k);c.width=w;c.height=h;
+      var g=c.getContext("2d",{willReadFrequently:true});g.drawImage(img,0,0,w,h);
+      var r=window.jsQR(g.getImageData(0,0,w,h).data,w,h,{inversionAttempts:"attemptBoth"});
+      URL.revokeObjectURL(img.src);
+      if(!(r&&r.data&&xuLyMa(r.data)))$("camTop").textContent="Không đọc được tem trong ảnh. Chụp gần hơn, đủ sáng.";
+    };img.src=URL.createObjectURL(f);
+  });
+};
 $("bQuet").onclick=moCam;
 $("camDong").onclick=dongCam;
 $("tuMo").checked=doc(K_AUTO,false);
